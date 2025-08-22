@@ -46,10 +46,10 @@ namespace MonitorOff
         }
         private void MonitorBtn_Click(object sender, EventArgs e)
         {
-            
+
             var bCtrl = (Control)sender;
             string name = bCtrl.Name;
-            
+
             var f = FindFormByName(name);
             if (f != null && f.Opacity == 0.7D)
             {
@@ -69,7 +69,7 @@ namespace MonitorOff
                 bCtrl.Tag = true;
                 TopMost = true;
             }
-            
+
         }
         private void MonitorBtn_MouseEnter(object sender, EventArgs e)
         {
@@ -113,7 +113,7 @@ namespace MonitorOff
             overlay.TopMost = true;
             return overlay;
         }
-        
+
         private Form FindFormByName(string MonitorName)
         {
             for (int i = Application.OpenForms.Count - 1; i >= 0; i--)
@@ -124,9 +124,5 @@ namespace MonitorOff
             return null;
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
