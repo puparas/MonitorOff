@@ -58,6 +58,23 @@ namespace MonitorOff.Core
 
         public const int GwlExstyle = -20;
         public const int WsExTransparent = 0x00000020;
+        public const int WsExNoActivate = 0x08000000;
+
+        public static readonly IntPtr HwndTop = new IntPtr(0);
+
+        public const uint SwpNomove = 0x0002;
+        public const uint SwpNosize = 0x0001;
+        public const uint SwpNoActivate = 0x0010;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool SetWindowPos(
+            IntPtr hWnd,
+            IntPtr hWndInsertAfter,
+            int x,
+            int y,
+            int cx,
+            int cy,
+            uint uFlags);
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
         private static extern int GetWindowLong32(IntPtr hWnd, int nIndex);
@@ -70,6 +87,21 @@ namespace MonitorOff.Core
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
         private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        public static void SetWindowAbove(IntPtr window, IntPtr belowWindow)
+        {
+            if (window == IntPtr.Zero || belowWindow == IntPtr.Zero)
+                return;
+
+            SetWindowPos(
+                window,
+                belowWindow,
+                0,
+                0,
+                0,
+                0,
+                SwpNomove | SwpNosize | SwpNoActivate);
+        }
 
         public static void SetClickThrough(IntPtr hwnd, bool enabled)
         {

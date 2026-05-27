@@ -22,7 +22,7 @@ namespace MonitorOff.UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.AutoSize = true;
+            this.AutoSize = false;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(32)))));
             this.ClientSize = new System.Drawing.Size(36, 36);
             this.ControlBox = false;
@@ -30,7 +30,7 @@ namespace MonitorOff.UI
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(36, 36);
+            this.MinimumSize = new System.Drawing.Size(1, 1);
             this.Name = "ControlPanelForm";
             this.Opacity = 0.65D;
             this.ShowInTaskbar = false;

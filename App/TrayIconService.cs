@@ -9,13 +9,15 @@ namespace MonitorOff.App
     {
         private readonly MonitorManager _monitors;
         private readonly Action _onExit;
+        private readonly Action _onBulkStateChanged;
         private readonly NotifyIcon _notifyIcon;
         private readonly ContextMenuStrip _menu;
 
-        public TrayIconService(MonitorManager monitors, Icon icon, Action onExit)
+        public TrayIconService(MonitorManager monitors, Icon icon, Action onExit, Action onBulkStateChanged)
         {
             _monitors = monitors ?? throw new ArgumentNullException(nameof(monitors));
             _onExit = onExit ?? throw new ArgumentNullException(nameof(onExit));
+            _onBulkStateChanged = onBulkStateChanged ?? throw new ArgumentNullException(nameof(onBulkStateChanged));
 
             _menu = new ContextMenuStrip();
             _notifyIcon = new NotifyIcon
@@ -26,7 +28,11 @@ namespace MonitorOff.App
                 ContextMenuStrip = _menu
             };
 
-            _notifyIcon.DoubleClick += (_, __) => _monitors.TurnOnAll();
+            _notifyIcon.DoubleClick += (_, __) =>
+            {
+                _monitors.TurnOnAll();
+                _onBulkStateChanged();
+            };
 
             BuildMenu();
         }
@@ -64,8 +70,20 @@ namespace MonitorOff.App
             _menu.Items.Add(new ToolStripSeparator());
 
             var turnOnAll = new ToolStripMenuItem("Включить все мониторы");
-            turnOnAll.Click += (_, __) => _monitors.TurnOnAll();
+            turnOnAll.Click += (_, __) =>
+            {
+                _monitors.TurnOnAll();
+                _onBulkStateChanged();
+            };
             _menu.Items.Add(turnOnAll);
+
+            var turnOffAll = new ToolStripMenuItem("Выключить все мониторы");
+            turnOffAll.Click += (_, __) =>
+            {
+                _monitors.TurnOffAll();
+                _onBulkStateChanged();
+            };
+            _menu.Items.Add(turnOffAll);
 
             _menu.Items.Add(new ToolStripSeparator());
 

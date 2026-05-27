@@ -8,19 +8,26 @@ namespace MonitorOff.Core
     internal sealed class MonitorManager : IDisposable
     {
         private readonly List<MonitorSession> _sessions = new List<MonitorSession>();
+        private Action _ensurePanelsOnTop;
 
         public event EventHandler<MonitorSession> SessionStateChanged;
 
         public IReadOnlyList<MonitorSession> Sessions => _sessions;
+
+        public void SetEnsurePanelsOnTopCallback(Action callback)
+        {
+            _ensurePanelsOnTop = callback;
+        }
 
         public void LoadMonitors()
         {
             UnsubscribeAll();
             _sessions.Clear();
 
-            foreach (var screen in Screen.AllScreens.OrderBy(s => s.Bounds.X).ThenBy(s => s.Bounds.Y))
+            var screens = Screen.AllScreens.OrderBy(s => s.Bounds.X).ThenBy(s => s.Bounds.Y).ToList();
+            for (int i = 0; i < screens.Count; i++)
             {
-                var session = new MonitorSession(screen);
+                var session = new MonitorSession(screens[i], i + 1, _ensurePanelsOnTop);
                 session.StateChanged += OnSessionStateChanged;
                 _sessions.Add(session);
             }
@@ -35,6 +42,12 @@ namespace MonitorOff.Core
         {
             foreach (var session in _sessions)
                 session.TurnOn();
+        }
+
+        public void TurnOffAll()
+        {
+            foreach (var session in _sessions)
+                session.TurnOff();
         }
 
         public void Dispose()

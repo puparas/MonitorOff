@@ -2,7 +2,9 @@ namespace MonitorOff.Core
 {
     internal static class AppSettings
     {
-        public const int ButtonSize = 36;
+        public const int DefaultButtonSize = 36;
+        public const int MinButtonSize = 22;
+        public const int MaxButtonSize = 72;
         public const int ButtonSpacing = 2;
         public const int PanelMargin = 12;
 

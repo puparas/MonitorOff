@@ -12,6 +12,7 @@ namespace MonitorOff.App
     internal sealed class MonitorOffAppContext : ApplicationContext
     {
         private readonly MonitorManager _monitors = new MonitorManager();
+        private readonly PanelLayoutStore _layoutStore = new PanelLayoutStore();
         private readonly List<ControlPanelForm> _panels = new List<ControlPanelForm>();
         private TrayIconService _tray;
 
@@ -19,6 +20,7 @@ namespace MonitorOff.App
         {
             SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
             _monitors.SessionStateChanged += OnSessionStateChanged;
+            _monitors.SetEnsurePanelsOnTopCallback(EnsurePanelsAboveOverlays);
             Initialize();
         }
 
@@ -26,7 +28,8 @@ namespace MonitorOff.App
         {
             _monitors.LoadMonitors();
             CreatePanels();
-            _tray = new TrayIconService(_monitors, SystemIcons.Application, ExitApplication);
+            EnsurePanelsAboveOverlays();
+            _tray = new TrayIconService(_monitors, AppIcon.CreateTrayIcon(), ExitApplication, () => SyncUi(null));
         }
 
         private void CreatePanels()
@@ -35,7 +38,7 @@ namespace MonitorOff.App
 
             foreach (var screen in Screen.AllScreens.OrderBy(s => s.Bounds.X).ThenBy(s => s.Bounds.Y))
             {
-                var panel = new ControlPanelForm(screen, _monitors, IsSessionHoveredAnywhere, IsAnyButtonHoveredAnywhere);
+                var panel = new ControlPanelForm(screen, _monitors, _layoutStore, IsSessionHoveredAnywhere, IsAnyButtonHoveredAnywhere);
                 panel.Show();
                 _panels.Add(panel);
             }
@@ -76,11 +79,31 @@ namespace MonitorOff.App
                     panel.RefreshAllSessions();
                 else
                     panel.RefreshSession(session);
-
-                panel.KeepOnTop();
             }
 
+            EnsurePanelsAboveOverlays();
             _tray?.RefreshMenu();
+        }
+
+        private void EnsurePanelsAboveOverlays()
+        {
+            var overlayHandles = _monitors.Sessions
+                .Select(s => s.OverlayHandle)
+                .Where(h => h != IntPtr.Zero)
+                .ToList();
+
+            foreach (var panel in _panels)
+            {
+                if (!panel.IsHandleCreated)
+                    continue;
+
+                panel.TopMost = true;
+
+                foreach (var overlayHandle in overlayHandles)
+                    NativeMethods.SetWindowAbove(panel.Handle, overlayHandle);
+
+                panel.BringToFront();
+            }
         }
 
         private void OnDisplaySettingsChanged(object sender, EventArgs e)
