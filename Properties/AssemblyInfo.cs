@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // набора атрибутов. Измените значения этих атрибутов для изменения сведений,
 // связанных со сборкой.
 [assembly: AssemblyTitle("MonitorOff")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Панель управления затемнением и яркостью мониторов")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MonitorOff")]
